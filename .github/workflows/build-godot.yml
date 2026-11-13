@@ -55,6 +55,16 @@ jobs:
           echo '=== export preset ==='
           tail -n 18 export_presets.cfg
           godot --headless --path . --editor --script res://ci_diagnose.gd || true
+          echo '=== export templates files ==='
+          ls -lh ~/.local/share/godot/export_templates/4.4.1.stable | head -25
+          echo '=== debug keystore ==='
+          keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey
+          echo '=== Android tools ==='
+          "$ANDROID_HOME/build-tools/35.0.0/aapt2" version
+          echo '=== Godot project parse ==='
+          godot --headless --path . --check-only --script res://main.gd || true
+          echo '=== Android preset header ==='
+          head -n 30 export_presets.cfg
           godot --headless --verbose --path . --export-debug Android build/ThorRPG-v0.1-debug.apk
           test -s build/ThorRPG-v0.1-debug.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/ThorRPG-v0.1-debug.apk
