@@ -38,11 +38,9 @@ jobs:
           export/android/android_sdk_path = "$ANDROID_HOME"
           export/android/java_sdk_path = "$JAVA_HOME"
           EOF
-          cat >> godot/export_presets.cfg <<EOF
-          keystore/debug="$HOME/.android/debug.keystore"
-          keystore/debug_user="androiddebugkey"
-          keystore/debug_password="android"
-          EOF
+          sed -i "s|keystore/debug=\"\"|keystore/debug=\"$HOME/.android/debug.keystore\"|" godot/export_presets.cfg
+          sed -i 's|keystore/debug_user=""|keystore/debug_user="androiddebugkey"|' godot/export_presets.cfg
+          sed -i 's|keystore/debug_password=""|keystore/debug_password="android"|' godot/export_presets.cfg
       - name: Import project and export debug APK
         shell: bash
         run: |
