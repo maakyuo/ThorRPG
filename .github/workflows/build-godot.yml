@@ -50,7 +50,11 @@ jobs:
           cd godot
           mkdir -p build
           godot --headless --path . --editor --import --quit
-          godot --headless --path . --export-debug Android build/ThorRPG-v0.1-debug.apk
+          echo '=== Android editor settings ==='
+          cat ~/.config/godot/editor_settings-4.tres | grep -E 'android_sdk_path|java_sdk_path' || true
+          echo '=== export preset ==='
+          tail -n 18 export_presets.cfg
+          godot --headless --verbose --path . --export-debug Android build/ThorRPG-v0.1-debug.apk
           test -s build/ThorRPG-v0.1-debug.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/ThorRPG-v0.1-debug.apk
       - uses: actions/upload-artifact@v4
