@@ -1,0 +1,48 @@
+name: Build Godot v0.1 Android APK
+on:
+  push:
+    branches: [godot-prototype-v0.1]
+  workflow_dispatch:
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1 and Android export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 -o /tmp/godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp
+          sudo install /tmp/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          curl -fL --retry 3 -o /tmp/templates.tpz https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
+          unzip -q /tmp/templates.tpz -d /tmp/godot-templates
+          cp /tmp/godot-templates/templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
+      - name: Configure Android SDK and debug signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+          mkdir -p ~/.android
+          keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" -noprompt
+          printf '[gd_resource type="EditorSettings" format=3]\n' > /tmp/unused-settings.txt
+      - name: Import project and export debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd godot
+          mkdir -p build
+          godot --headless --path . --editor --import --quit
+          godot --headless --path . --export-debug Android build/ThorRPG-v0.1-debug.apk
+          test -s build/ThorRPG-v0.1-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/ThorRPG-v0.1-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ThorRPG-Godot-v0.1-APK
+          path: godot/build/ThorRPG-v0.1-debug.apk
+          if-no-files-found: error
