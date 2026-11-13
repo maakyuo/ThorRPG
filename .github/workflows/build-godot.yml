@@ -27,7 +27,7 @@ jobs:
           set -euo pipefail
           echo "ANDROID_HOME=$ANDROID_HOME"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
           mkdir -p ~/.android
           keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" -noprompt
           mkdir -p ~/.config/godot
@@ -54,6 +54,7 @@ jobs:
           cat ~/.config/godot/editor_settings-4.4.tres | grep -E 'android_sdk_path|java_sdk_path' || true
           echo '=== export preset ==='
           tail -n 18 export_presets.cfg
+          godot --headless --path . --editor --script res://ci_diagnose.gd || true
           godot --headless --verbose --path . --export-debug Android build/ThorRPG-v0.1-debug.apk
           test -s build/ThorRPG-v0.1-debug.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/ThorRPG-v0.1-debug.apk
