@@ -1,0 +1,19 @@
+<!doctype html><html lang="ko"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><style>*{box-sizing:border-box}body{margin:0;background:#10251d;color:white;font-family:sans-serif}#menu{position:absolute;inset:0;background:#10251d;z-index:2;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}button{padding:12px;border:1px solid #8db6b0;border-radius:8px;background:#284a52;color:white;font-size:16px}#play{display:none}canvas{width:100vw;height:100vh;display:block}#hud{position:absolute;left:15px;top:12px;pointer-events:none}#actions{position:absolute;right:12px;bottom:15px;display:flex;gap:9px}#dpad{position:absolute;left:15px;bottom:15px;display:grid;grid-template-columns:repeat(3,42px)}#dpad button{padding:8px;touch-action:none}</style><div id="menu"><h2>THOR RPG v0.5</h2><p>기본 직업을 선택하세요</p><div id="classes"></div></div><div id="play"><canvas id="world"></canvas><div id="hud"></div><div id="dpad"><span></span><button data-d="up">▲</button><span></span><button data-d="left">◀</button><span></span><button data-d="right">▶</button><span></span><button data-d="down">▼</button><span></span></div><div id="actions"><button id="hit">공격</button><button id="dash">회피</button></div></div><script>
+const $=id=>document.getElementById(id),c=$('world'),ctx=c.getContext('2d');let job='',x=400,y=250,hp=110,mp=110,level=1,exp=0,enemy=[],held={},last=0,face=0,inv=0,cd=0;
+['전사','마법사','궁수','암살자'].forEach(n=>{let b=document.createElement('button');b.textContent=n;b.onclick=()=>{job=n;$('menu').style.display='none';$('play').style.display='block';};$('classes').appendChild(b)});
+function attack(){if(!job)return;for(const e of enemy){let dx=e.x-x,dy=e.y-y,d=Math.hypot(dx,dy);if(d<85&&Math.cos(Math.atan2(dy,dx)-face)>.2){e.hp-=20;if(e.hp<=0){exp+=25;e.x=Math.random()*700+50;e.y=Math.random()*350+50;e.hp=60;if(exp>=100){exp-=100;level++;hp+=10;mp+=10}}}}}
+$('hit').onclick=attack;$('dash').onclick=()=>{if(performance.now()<cd)return;cd=performance.now()+1000;inv=performance.now()+400;x+=Math.cos(face)*54;y+=Math.sin(face)*54};
+document.querySelectorAll('[data-d]').forEach(b=>{const k=b.dataset.d;b.onpointerdown=e=>{e.preventDefault();held[k]=true;b.setPointerCapture(e.pointerId)};b.onpointerup=b.onpointercancel=()=>held[k]=false});
+document.onkeydown=e=>{held[e.key.toLowerCase()]=true;if(e.key==='j')attack()};document.onkeyup=e=>held[e.key.toLowerCase()]=false;
+for(let i=0;i<8;i++)enemy.push({x:80+Math.random()*640,y:40+Math.random()*420,hp:60});
+function frame(t){requestAnimationFrame(frame);let dt=Math.min(.05,(t-last)/1000||.016);last=t;if(!job)return;
+let gp=navigator.getGamepads&&navigator.getGamepads()[0],dx=(held.right||held.d?1:0)-(held.left||held.a?1:0),dy=(held.down||held.s?1:0)-(held.up||held.w?1:0);
+if(gp){dx+=gp.axes[0]||0;dy+=gp.axes[1]||0;if(gp.buttons[0]?.pressed&&t-(window.lastAttack||0)>300){attack();window.lastAttack=t}}
+if(dx||dy){face=Math.atan2(dy,dx);let m=Math.hypot(dx,dy);x+=dx/m*160*dt;y+=dy/m*160*dt}x=Math.max(15,Math.min(785,x));y=Math.max(15,Math.min(485,y));
+c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;ctx.setTransform(c.width/800,0,0,c.height/500,0,0);ctx.fillStyle='#204333';ctx.fillRect(0,0,800,500);
+for(let i=0;i<800;i+=40)for(let j=0;j<500;j+=40){ctx.fillStyle=(i+j)%80?'#28503d':'#234836';ctx.fillRect(i,j,38,38)}
+enemy.forEach(e=>{let d=Math.hypot(x-e.x,y-e.y);if(d>25){e.x+=(x-e.x)/d*35*dt;e.y+=(y-e.y)/d*35*dt}else if(t>inv&&t-(e.last||0)>1200){hp-=5;e.last=t;if(hp<=0){hp=55;x=400;y=250}}ctx.fillStyle='#b75860';ctx.fillRect(e.x-12,e.y-12,24,24)});
+ctx.fillStyle='#e7cb8d';ctx.fillRect(x-12,y-14,24,28);ctx.fillStyle='#fff';ctx.fillRect(x+Math.cos(face)*12-3,y+Math.sin(face)*12-3,6,6);
+$('hud').textContent=job+' · Lv.'+level+' · HP '+hp+' · MP '+mp+' · EXP '+exp+'/100';
+}requestAnimationFrame(frame);
+</script></html>
