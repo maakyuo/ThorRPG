@@ -66,7 +66,7 @@ func _spawn_mobs() -> void:
  mobs.clear()
  var places := [Vector2(540,450),Vector2(720,490),Vector2(1460,520),Vector2(1610,600),Vector2(500,1120),Vector2(650,1220),Vector2(1640,1100),Vector2(1830,1200)]
  for i in places.size():
-  var kind := i / 2
+  var kind: int = i / 2
   var m: Dictionary = MONSTERS[kind].duplicate(true)
   m["pos"] = places[i]
   m["home"] = places[i]
@@ -164,9 +164,9 @@ func _refresh_ui() -> void:
   _label("장비를 누르면 착용 / 해제됩니다.")
   for i in ITEMS.size():
    var item: Dictionary = ITEMS[i]
-   var active := equipped[item["slot"]] == i
-   var suffix := " [착용 중]" if active else ""
-   var bonus := "공격 +%d" % item.get("atk",0) if item.has("atk") else ("마법 +%d" % item.get("magic",0) if item.has("magic") else "방어 +%d" % item.get("def",0))
+   var active: bool = int(equipped[str(item["slot"])]) == i
+   var suffix: String = " [착용 중]" if active else ""
+   var bonus: String = "공격 +%d" % item.get("atk",0) if item.has("atk") else ("마법 +%d" % item.get("magic",0) if item.has("magic") else "방어 +%d" % item.get("def",0))
    _button("%s  |  %s%s" % [item["name"],bonus,suffix],_equip.bind(i))
   _label("장비 등급: 일반 · 희귀 · 영웅 · 전설 · 신화 · 고유",14)
   _button("닫기",_close_menu)
@@ -522,7 +522,7 @@ func _load_game() -> void:
  var saved_equipment = data.get("equipped",{})
  if typeof(saved_equipment) == TYPE_DICTIONARY:
   for slot in equipped:
-   var idx := int(saved_equipment.get(slot,-1))
+   var idx: int = int(saved_equipment.get(slot,-1))
    equipped[slot] = idx if idx >= 0 and idx < ITEMS.size() and ITEMS[idx]["slot"] == slot else -1
  hp = clampf(float(data.get("hp",_max_hp())),1.0,_max_hp())
  mp = clampf(float(data.get("mp",_max_mp())),0.0,_max_mp())
