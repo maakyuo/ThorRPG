@@ -1,4 +1,4 @@
-name: Build Godot v0.1 Android APK
+name: Build Thor RPG Pixel Art Android APK
 on:
   push:
     branches: [godot-prototype-v0.1, experiment-rpg-core-v0.2]
@@ -10,6 +10,21 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch uploaded pixel art project from main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: art-source
+      - name: Install pixel art Godot project
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -o -q art-source/ThorRPG_Art_Prototype_v01.zip 'godot/*' -d .
+          test -f godot/assets/player_0_0.png
+          test -f godot/assets/goblin.png
+          test -f godot/main.gd
+          echo 'Pixel art assets and game script installed'
+
       - name: Install Godot 4.4.1 and Android export templates
         shell: bash
         run: |
@@ -60,7 +75,7 @@ jobs:
           echo '=== Android tools ==='
           "$ANDROID_HOME/build-tools/35.0.0/aapt2" version
           echo '=== Godot project parse ==='
-          godot --headless --path . --check-only --script res://experiment_v02.gd
+          godot --headless --path . --check-only --script res://main.gd
           echo '=== Android preset header ==='
           head -n 30 export_presets.cfg
           echo '=== Android export environment ==='
@@ -71,11 +86,11 @@ jobs:
           echo '=== Runtime smoke test ==='
           godot --headless --path . --quit-after 2
           echo '=== Android export ==='
-          godot --headless --verbose --path . --export-debug Android build/ThorRPG-v0.1-debug.apk
-          test -s build/ThorRPG-v0.1-debug.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/ThorRPG-v0.1-debug.apk
+          godot --headless --verbose --path . --export-debug Android build/ThorRPG-PixelArt-v0.3-debug.apk
+          test -s build/ThorRPG-PixelArt-v0.3-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/ThorRPG-PixelArt-v0.3-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: ThorRPG-Godot-v0.1-APK
-          path: godot/build/ThorRPG-v0.1-debug.apk
+          name: ThorRPG-PixelArt-v0.3-APK
+          path: godot/build/ThorRPG-PixelArt-v0.3-debug.apk
           if-no-files-found: error
