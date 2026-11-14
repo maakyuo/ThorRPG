@@ -5,13 +5,13 @@ old = ''' for path in DirAccess.get_files_at("res://assets"):
   if path.ends_with(".png"):
    textures[path.trim_suffix(".png")] = load("res://assets/"+path)'''
 new = ''' for key in ["grass","grass_0","grass_1","grass_2","flowers_0","flowers_1","dirt","house","tree_0","tree_1","tree_2","bush_0","bush_1","npc_0","npc_1","npc_2","rabbit","horn_rabbit","wolf","goblin","rock","stump"]:
-  var path := "res://assets/" + key + ".png"
+  var path: String = "res://assets/" + str(key) + ".png"
   if ResourceLoader.exists(path):
    textures[key] = load(path)
  for direction in 4:
   for frame in 4:
-   var key := "player_%d_%d" % [direction,frame]
-   var path := "res://assets/" + key + ".png"
+   var key: String = "player_%d_%d" % [direction,frame]
+   var path: String = "res://assets/" + str(key) + ".png"
    if ResourceLoader.exists(path):
     textures[key] = load(path)'''
 assert old in s, "sprite loader source changed"
