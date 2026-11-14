@@ -56,3 +56,13 @@ p.write_text(s)
 scene=Path("godot/main.tscn")
 scene.write_text('[gd_scene load_steps=2 format=3]\n\n[ext_resource type="Script" path="res://experiment_v02.gd" id="1"]\n\n[node name="ThorRPG" type="Node2D"]\nscript = ExtResource("1")\n')
 print("Integrated RPG creation, equipment, stats, skills and pixel-art sprites with seamless base ground")
+
+# Fix UI: a full-rect Control parented to Node2D has no sized Control parent.
+# Attach HUD to a CanvasLayer and explicitly size it to the viewport.
+s=p.read_text()
+s=s.replace('var ui: Control','var hud_layer: CanvasLayer\nvar ui: Control')
+s=s.replace(' ui = Control.new()\n ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)\n ui.mouse_filter = Control.MOUSE_FILTER_PASS\n add_child(ui)',' hud_layer = CanvasLayer.new()\n hud_layer.layer = 10\n add_child(hud_layer)\n ui = Control.new()\n ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)\n ui.size = get_viewport_rect().size\n ui.mouse_filter = Control.MOUSE_FILTER_PASS\n hud_layer.add_child(ui)\n get_viewport().size_changed.connect(_resize_hud)')
+s=s.replace('func _clear_panel() -> void:', 'func _resize_hud() -> void:\n ui.size = get_viewport_rect().size\n\nfunc _clear_panel() -> void:')
+s=s.replace(' var sprite_key: String = "player_%d_%d" % [direction,int(elapsed*5.0)%4]', ' var moving: bool = Input.get_vector("move_left","move_right","move_up","move_down").length() > 0.1 or touch_move.length() > 0.1\n var frame: int = int(elapsed*5.0)%4 if moving and stage == 3 and menu == "" else 0\n var sprite_key: String = "player_%d_%d" % [direction,frame]')
+p.write_text(s)
+print("Fixed HUD CanvasLayer/viewport sizing and stopped idle walking animation")
