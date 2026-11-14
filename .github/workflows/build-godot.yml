@@ -33,6 +33,7 @@ jobs:
           python3 godot/ci_responsive_world.py
           python3 godot/ci_v05_equipment_ui.py
           python3 godot/ci_v06_forest.py
+          python3 godot/ci_v06_feedback.py
           test -f godot/assets/player_0_0.png
           test -f godot/assets/goblin.png
       - name: Install Godot 4.4.1 and Android export templates
