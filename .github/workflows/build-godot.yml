@@ -32,6 +32,7 @@ jobs:
           python3 godot/ci_integrate_rpg.py
           python3 godot/ci_responsive_world.py
           python3 godot/ci_v05_equipment_ui.py
+          python3 godot/ci_v06_forest.py
           test -f godot/assets/player_0_0.png
           test -f godot/assets/goblin.png
       - name: Install Godot 4.4.1 and Android export templates
@@ -97,11 +98,11 @@ jobs:
           echo '=== Export preset diagnostics ==='
           godot --headless --path . --editor --quit || true
           echo '=== Android export ==='
-          godot --headless --verbose --path . --export-debug Android build/ThorRPG-PixelArt-v0.5-debug.apk
-          test -s build/ThorRPG-PixelArt-v0.5-debug.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/ThorRPG-PixelArt-v0.5-debug.apk
+          godot --headless --verbose --path . --export-debug Android build/ThorRPG-PixelArt-v0.6-debug.apk
+          test -s build/ThorRPG-PixelArt-v0.6-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose build/ThorRPG-PixelArt-v0.6-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: ThorRPG-PixelArt-v0.5-APK
-          path: godot/build/ThorRPG-PixelArt-v0.5-debug.apk
+          name: ThorRPG-PixelArt-v0.6-APK
+          path: godot/build/ThorRPG-PixelArt-v0.6-debug.apk
           if-no-files-found: error
