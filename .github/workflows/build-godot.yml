@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          unzip -o -q art-source/ThorRPG_Art_Prototype_v01.zip 'godot/*' -d .
+          unzip -o -q art-source/ThorRPG_Art_Prototype_v01.zip 'godot/main.gd' 'godot/main.tscn' 'godot/assets/*' -d .
           test -f godot/assets/player_0_0.png
           test -f godot/assets/goblin.png
           test -f godot/main.gd
@@ -85,6 +85,8 @@ jobs:
           test -f "$HOME/.android/debug.keystore"
           echo '=== Runtime smoke test ==='
           godot --headless --path . --quit-after 2
+          echo '=== Export preset diagnostics ==='
+          godot --headless --path . --editor --quit || true
           echo '=== Android export ==='
           godot --headless --verbose --path . --export-debug Android build/ThorRPG-PixelArt-v0.3-debug.apk
           test -s build/ThorRPG-PixelArt-v0.3-debug.apk
