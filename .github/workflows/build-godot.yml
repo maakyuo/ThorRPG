@@ -38,6 +38,7 @@ jobs:
           python3 -m pip install --break-system-packages Pillow
           python3 godot/ci_generate_sprites.py
           python3 godot/ci_v08_sprite_integration.py
+          python3 godot/ci_v09_movement_foundation.py
           python3 godot/ci_v09_vertical_slice.py
           test -f godot/assets/player_0_0.png
           test -f godot/assets/goblin.png
