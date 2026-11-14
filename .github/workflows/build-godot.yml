@@ -1,7 +1,7 @@
 name: Build Godot v0.1 Android APK
 on:
   push:
-    branches: [godot-prototype-v0.1]
+    branches: [godot-prototype-v0.1, experiment-rpg-core-v0.2]
   workflow_dispatch:
 jobs:
   android:
@@ -60,7 +60,7 @@ jobs:
           echo '=== Android tools ==='
           "$ANDROID_HOME/build-tools/35.0.0/aapt2" version
           echo '=== Godot project parse ==='
-          godot --headless --path . --check-only --script res://main.gd
+          godot --headless --path . --check-only --script res://experiment_v02.gd
           echo '=== Android preset header ==='
           head -n 30 export_presets.cfg
           echo '=== Android export environment ==='
