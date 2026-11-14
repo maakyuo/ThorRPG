@@ -36,7 +36,9 @@ def tree(kind):
     x=int(cx+math.cos(a)*rad*rr);y=int(cy+math.sin(a)*rad*.72*rr)
     d.rectangle((x,y,x+r.randrange(2,6),y+r.randrange(2,5)),fill=r.choice(colors))
  return im
-for i in range(3):save(tree(i),"tree_"+str(i))
+# Keep the detailed original tree assets; do not overwrite with procedural art.
+for i in range(3):
+ assert (root/("tree_%d.png" % i)).is_file(), "Missing original tree sprite %d" % i
 def gear(kind):
  r=random.Random(kind+90);im=Image.new("RGBA",(48,48));d=ImageDraw.Draw(im)
  dark="#302c30";iron="#d1d9d7";shine="#f3f5e7";gold="#c6a062";wood="#82553c"
